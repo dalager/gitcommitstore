@@ -1,7 +1,6 @@
 $resourcegroup = "commitstore-rg"
 $storagequeue = "commitqueue"
 $envvariable = "COMMITSTORE_QUEUE_URL"
-#$envvariable = "COMMITLOGGER_QUEUE_URL"
 
 # get the first storage account in the resource group
 $storageaccount = az storage account list --resource-group $resourcegroup --query "[0].name" -o tsv

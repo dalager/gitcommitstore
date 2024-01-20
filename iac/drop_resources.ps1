@@ -1,5 +1,5 @@
 $resourcegroup = "commitstore-rg"
-$envvariable = "COMMITLOGGER_QUEUE_URL"
+$envvariable = "COMMITSTORE_QUEUE_URL"
 
 function prompt([string]$query) {
     while ($true) {
