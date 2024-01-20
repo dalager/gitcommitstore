@@ -1,9 +1,8 @@
-```plantuml
-@startuml
+@startuml big_picture_diagram
 
 box "CommitLogger"
 Actor "CommitUser" as U
-Participant "Commitqueue" as Q
+Participant "Azure Storage Queue" as Q
 end box
 box "CommitStore" #LightGreen
 Participant "Azure function" as F
@@ -19,4 +18,3 @@ F -> Db : writes to database
 FU -> W: Looks at commit log UI
 W -> Db : reads from database
 @enduml
-```
