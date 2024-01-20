@@ -5,7 +5,7 @@ box "CommitLogger"
 Actor "CommitUser" as U
 Participant "Commitqueue" as Q
 end box
-box "CommitStore"
+box "CommitStore" #LightGreen
 Participant "Azure function" as F
 Participant "Azure Cosmos DB" as Db
 end box
