@@ -1,8 +1,8 @@
-# Azure function - CommitLogger
+# Azure function - Commitstore
 
 ## overview
 
-- will be triggered by a message in azure storage queue
+- will be triggered by a message in azure commtstorage queue
 - will write the json in the message payload to cosmos db
 
 ## Setup trigger

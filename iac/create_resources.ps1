@@ -1,5 +1,6 @@
 $random = Get-Random -Minimum 1000 -Maximum 9999
 $resourcegroup = "commitstore-rg"
+$functionappname = "commitprocessor-4720"
 $location = "westeurope"
 $storageaccount = "commitstorestorage$random"
 $storagequeue = "commitqueue"
@@ -10,7 +11,6 @@ $database = "commitstore-db"
 $partitionKey = "/repository"
 $container = "commits"
 
-$functionappname = "commitprocessor-4720"
 #
 # Create resource group
 az group create --name $resourcegroup --location $location
@@ -29,6 +29,14 @@ az functionapp create --resource-group $resourcegroup --consumption-plan-locatio
 az functionapp config appsettings set -g $resourcegroup -n $functionappname --settings 'WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED=1'
 az functionapp config set -g $resourcegroup -n $functionappname  --net-framework-version 'v8.0'
 az functionapp config set -g $resourcegroup -n $functionappname --use-32bit-worker-process false
+
+# enable system assigned identity
+az functionapp identity assign -g $resourcegroup -n $functionappname
+
+# get the identity
+$identity = az functionapp identity show -g $resourcegroup -n $functionappname --query "principalId" -o tsv
+
+
 
 # ------------------ THIS IS A TEST COMMITLOGGER QUEUE ----------------
 # create queue
