@@ -13,6 +13,20 @@ This is not a good practice.
 The connection strings should be stored in the Azure Key Vault and retrieved from there.
 Or the function should use Managed Service Identity to access the Azure Storage Queue and the Azure Cosmos DB.
 
+#### Against Azure Storage Queue
+
+Role: Storage Queue Data Message Processor
+https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage-queue-data-message-processor
+
+### Against Azure Cosmos DB
+
+https://learn.microsoft.com/en-us/azure/cosmos-db/how-to-setup-rbac
+
+- grant data reader
+- grant data contributor
+
+https://learn.microsoft.com/en-us/azure/cosmos-db/managed-identity-based-authentication
+
 ### Monitoring
 
 The function should be monitored with Application Insights.
