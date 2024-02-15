@@ -1,6 +1,8 @@
 using System.Net;
 using System.Text.Json;
 using CommitStore.Functions;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -17,35 +19,35 @@ namespace Function
         }
 
         [Function("GetCommits")]
-        public HttpResponseData Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData req
+        public async Task<HttpResponseData> Run(
+            [HttpTrigger(AuthorizationLevel.User, "get", "post")] HttpRequestData req
         )
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
             var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-            CommitData[] commits =
-            [
-                new CommitData
-                {
-                    Id = "1",
-                    Repository = "Repo1",
-                    Branch = "main",
-                    Author = "Author1",
-                    Message = "Initial commit",
-                    Timestamp = System.DateTimeOffset.UtcNow
-                },
-                new CommitData
-                {
-                    Id = "2",
-                    Repository = "Repo2",
-                    Branch = "main",
-                    Author = "Author2",
-                    Message = "Initial commit",
-                    Timestamp = System.DateTimeOffset.UtcNow
-                }
-            ];
+
+            // get cosmosdbconnectionstring
+            var cosmosDbConnectionString = Environment.GetEnvironmentVariable("CosmosDBConnection");
+            var client = new CosmosClient(cosmosDbConnectionString);
+            var database = client.GetDatabase("commitstore-db");
+            var container = database.GetContainer("commits");
+
+            QueryDefinition query = new QueryDefinition("SELECT * FROM c");
+
+            var feedIterator = container
+                .GetItemLinqQueryable<CommitData>(
+                    allowSynchronousQueryExecution: true,
+                    requestOptions: new QueryRequestOptions { MaxItemCount = 1000 }
+                )
+                .ToFeedIterator();
+
+            var commits = new List<CommitData>();
+            while (feedIterator.HasMoreResults)
+            {
+                var commitResponses = await feedIterator.ReadNextAsync();
+                commits.AddRange(commitResponses);
+            }
             response.WriteString(JsonSerializer.Serialize(commits));
 
             return response;
