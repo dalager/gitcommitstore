@@ -16,8 +16,16 @@ namespace CommitStore.Functions
         }
 
         [Function(nameof(CommitTrigger))]
-        [CosmosDBOutput("commitstore-db", "commits", Connection = "CosmosDBConnection", CreateIfNotExists = false)]
-        public object Run([QueueTrigger("commitqueue", Connection = "StorageQueueConnection")] QueueMessage message)
+        [CosmosDBOutput(
+            "commitstore-db",
+            "commits",
+            Connection = "CosmosDBConnection",
+            CreateIfNotExists = false
+        )]
+        public object Run(
+            [QueueTrigger("commitqueue", Connection = "StorageQueueConnection")]
+                QueueMessage message
+        )
         {
             _logger.LogInformation($"Processing commit from CommitLogger queue");
             var json = message.MessageText;
@@ -25,52 +33,35 @@ namespace CommitStore.Functions
 
             // connect to cosmosdb
             JsonDocument jsondoc;
+            CommitData commit;
             try
             {
-                jsondoc = System.Text.Json.JsonDocument.Parse(json);
+                jsondoc = JsonDocument.Parse(json);
+                commit = new CommitData
+                {
+                    Id = GetStringFromJsonDocument(jsondoc, "commit_hash"),
+                    Repository = GetStringFromJsonDocument(jsondoc, "repository"),
+                    Branch = GetStringFromJsonDocument(jsondoc, "branch"),
+                    Author = GetStringFromJsonDocument(jsondoc, "author"),
+                    Message = GetStringFromJsonDocument(jsondoc, "commit_message"),
+                    Timestamp = message.InsertedOn?.DateTime ?? DateTimeOffset.UtcNow
+                };
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Unable to parse json: {ex.Message}, jsonvalue:'{json}'");
                 throw;
             }
-
-            if (jsondoc != null)
-            {
-                var commit = new CommitData
-                {
-                    Id = jsondoc.RootElement.GetProperty("commit_hash").GetString(),
-                    Repository = jsondoc.RootElement.GetProperty("repository").GetString(),
-                    Branch = jsondoc.RootElement.GetProperty("branch").GetString(),
-                    Author = jsondoc.RootElement.GetProperty("author").GetString(),
-                    Message = jsondoc.RootElement.GetProperty("commit_message").GetString(),
-                    Timestamp = message.InsertedOn?.DateTime ?? DateTimeOffset.UtcNow
-                };
-
-                var jsoncommit = JsonSerializer.Serialize(commit);
-                _logger.LogInformation($"Saving this to Cosmos: {jsoncommit}");
-                return commit;
-            }
-            else
-            {
-                throw new Exception("Unable to parse json");
-            }
+            _logger.LogInformation($"Saving this to Cosmos: {JsonSerializer.Serialize(commit)}");
+            return commit
+                ?? throw new InvalidOperationException("Commit data was not initialized.");
         }
-    }
 
-    public class CommitData
-    {
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; }
-        [System.Text.Json.Serialization.JsonPropertyName("repository")]
-        public string Repository { get; set; }
-        [System.Text.Json.Serialization.JsonPropertyName("branch")]
-        public string Branch { get; set; }
-        [System.Text.Json.Serialization.JsonPropertyName("author")]
-        public string Author { get; set; }
-        [System.Text.Json.Serialization.JsonPropertyName("message")]
-        public string Message { get; set; }
-        [System.Text.Json.Serialization.JsonPropertyName("timestamp")]
-        public DateTimeOffset Timestamp { get; set; }
+        public static string GetStringFromJsonDocument(JsonDocument doc, string propertyName)
+        {
+            var prop = doc.RootElement.GetProperty(propertyName);
+            return prop.GetString()
+                ?? throw new InvalidOperationException($"Property {propertyName} not found");
+        }
     }
 }
