@@ -4,6 +4,11 @@ This is the middle layer of the CommitStore system. It is responsible for retrie
 
 ![Big Picture Diagram](docs/images/big_picture_diagram.png)
 
+## Deployment
+
+Deploys with github actions to Azure Functions.
+See [deploy_functions_to_azure.yml](.github/workflows/deploy_functions_to_azure.yml)
+
 ## Todos
 
 ### Authentication
