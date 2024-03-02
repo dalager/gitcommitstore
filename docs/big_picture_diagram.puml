@@ -4,17 +4,22 @@ box "CommitLogger"
 Actor "CommitUser" as U
 Participant "Azure Storage Queue" as Q
 end box
+
 box "CommitStore" #LightGreen
-Participant "Azure function" as F
+Participant "CommitTrigger\n<QueueTrigger Function>" as commitTrigger
 Participant "Azure Cosmos DB" as Db
+Participant "SearchCommits\n<HttpTrigger Function>" as searchFunc
 end box
+
 box "CommitUI"
-Participant "WebUi" as W
+Participant "CommitsUI\n<Blazor WASM>" as W
 Actor "FrontendUser" as FU
 end box
 U -> Q: POST /api/commitqueue
-F -> Q: listens for new messages
-F -> Db : writes to database
+commitTrigger -> Q: QueueTrigger
+commitTrigger -> Db : Insert commit
 FU -> W: Looks at commit log UI
-W -> Db : reads from database
+W -> searchFunc : Search
+searchFunc -> Db : Select commits
+
 @enduml
