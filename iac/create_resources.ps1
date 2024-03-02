@@ -59,12 +59,18 @@ $cosmosconnstr = az cosmosdb keys list --name $cosmosdb --resource-group $resour
 
 az keyvault secret set --vault-name $keyvault --name "CosmosDbConnectionString" --value $cosmosconnstr
 
-# now the function app can read secrets from the key vault by using this url
-#@Microsoft.KeyVault(SecretUri=https://$keyvault.vault.azure.net/secrets/CosmosDbConnectionString)
-
 # add the keyvault reference to the function app
 $vaultref = "@Microsoft.KeyVault(SecretUri=https://$keyvault.vault.azure.net/secrets/CosmosDbConnectionString)"
 az functionapp config appsettings set -g $resourcegroup -n $functionappname --settings CosmosDbConnection=$vaultref
+
+
+$commitqueueconnstr = "<GET THE CONNECTION STRING FROM THE AZURE PORTAL>"
+az keyvault secret set --vault-name $keyvault --name "StorageQueueConnection" --value $commitqueueconnstr
+$qvaultref = "@Microsoft.KeyVault(SecretUri=https://$keyvault.vault.azure.net/secrets/StorageQueueConnection)"
+az functionapp config appsettings set -g $resourcegroup -n $functionappname --settings StorageQueueConnection=$qvaultref
+
+# IMPORTANT: check the appsettings in the portal. That last closing paranthesis is not always added correctly. If it's missing, the function app will not start.
+
 
 # # ------------------ THIS IS A TEST COMMITLOGGER QUEUE ----------------
 # # create queue
