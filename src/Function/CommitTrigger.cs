@@ -27,9 +27,8 @@ namespace CommitStore.Functions
                 QueueMessage message
         )
         {
-            _logger.LogInformation($"Processing commit from CommitLogger queue");
             var json = message.MessageText;
-            _logger.LogInformation($"Received CommitData: {json}");
+            _logger.LogInformation("Received CommitData: {Json}", json);
 
             // connect to cosmosdb
             JsonDocument jsondoc;
@@ -49,12 +48,15 @@ namespace CommitStore.Functions
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Unable to parse json: {ex.Message}, jsonvalue:'{json}'");
+                _logger.LogError(ex, "Unable to parse json:'{Json}'", json);
                 throw;
             }
-            _logger.LogInformation($"Saving this to Cosmos: {JsonSerializer.Serialize(commit)}");
-            return commit
-                ?? throw new InvalidOperationException("Commit data was not initialized.");
+            _logger.LogInformation(
+                "Saving this to Cosmos: {Json}",
+                JsonSerializer.Serialize(commit)
+            );
+
+            return commit;
         }
 
         public static string GetStringFromJsonDocument(JsonDocument doc, string propertyName)

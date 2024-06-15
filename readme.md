@@ -9,15 +9,6 @@ This is the middle layer of the CommitStore system. It is responsible for retrie
 Deploys with github actions to Azure Functions.
 See [deploy_functions_to_azure.yml](.github/workflows/deploy_functions_to_azure.yml)
 
-## Todos
-
-### Authentication
-
-The function keeps the connection strings to the Azure Cosmos DB and the Azure Storage Queue in the Function Configuration in the Azure Portal.
-This is not a good practice.
-The connection strings should be stored in the Azure Key Vault and retrieved from there.
-Or the function should use Managed Service Identity to access the Azure Storage Queue and the Azure Cosmos DB.
-
 #### Against Azure Storage Queue
 
 Role: Storage Queue Data Message Processor
