@@ -31,3 +31,5 @@ Alerts should be configured for the following metrics:
 - Number of failed executions against the Database
 - Number of failed executions against the Queue
 - Number of successful executions
+
+![Azure Deployed](https://github.com/dalager/gitcommitstore/actions/workflows/deploy_functions_to_azure.yml/badge.svg)
