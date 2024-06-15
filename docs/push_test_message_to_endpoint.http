@@ -1,0 +1,7 @@
+
+POST {{$processEnv COMMITSTORE_QUEUE_URL}} HTTP/1.1
+Content-Type: application/xml
+
+<QueueMessage><MessageText>eyJjb21taXRfaGFzaCI6ICI1ODZjMzY0MGRkYWExZTFhNjA5ZTMxMmU4MTJmODRlZmVjZTIwZTkz
+IiwgInJlcG9zaXRvcnkiOiAiIiwgImJyYW5jaCI6ICJtYXN0ZXIiLCAiYXV0aG9yIjogIkNocmlz
+dGlhbiBEYWxhZ2VyIiwgImNvbW1pdF9tZXNzYWdlIjogImZsb3cifQ0K</MessageText></QueueMessage> 
