@@ -29,7 +29,7 @@ namespace Function
             // get search param querystring 'q'
             var queryString = req.Url.Query;
             var searchParam = System.Web.HttpUtility.ParseQueryString(queryString).Get("q") ?? "";
-            _logger.LogInformation($"Search param: {searchParam}");
+            _logger.LogInformation("Search param: {SearchParam}", searchParam);
 
             // get cosmosdbconnectionstring
             var cosmosDbConnectionString = Environment.GetEnvironmentVariable("CosmosDBConnection");
@@ -42,14 +42,15 @@ namespace Function
             ).WithParameter("@searchParam", searchParam);
 
             var feedIterator = container.GetItemQueryIterator<CommitData>(qdef);
-            // var feedIterator = queryable.ToFeedIterator();
+
             var commits = new List<CommitData>();
             while (feedIterator.HasMoreResults)
             {
                 var commitResponses = await feedIterator.ReadNextAsync();
                 commits.AddRange(commitResponses);
             }
-            response.WriteString(JsonSerializer.Serialize(commits));
+
+            await response.WriteStringAsync(JsonSerializer.Serialize(commits));
 
             return response;
         }
