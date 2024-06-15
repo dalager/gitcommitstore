@@ -1,6 +1,9 @@
 name: Deploy Commitstore Trigger function to Azure
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 env:
   AZURE_FUNCTIONAPP_NAME: "commitprocessor-4720" # set this to your function app name on Azure
