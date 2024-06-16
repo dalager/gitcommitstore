@@ -34,8 +34,9 @@ namespace Function
             // get cosmosdbconnectionstring
             var cosmosDbConnectionString = Environment.GetEnvironmentVariable("CosmosDBConnection");
             var client = new CosmosClient(cosmosDbConnectionString);
-            var database = client.GetDatabase("commitstore-db");
-            var container = database.GetContainer("commits");
+            var database = client.GetDatabase(                     "commitstore-db");
+            var container = 
+database.GetContainer("commits");
 
             QueryDefinition qdef = new QueryDefinition(
                 $"SELECT * FROM c where CONTAINS(c.message, @searchParam,true) or CONTAINS(c.branch, @searchParam,true) order by c.timestamp desc"
