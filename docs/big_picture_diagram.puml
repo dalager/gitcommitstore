@@ -19,7 +19,7 @@ U -> Q: POST /api/commitqueue
 commitTrigger -> Q: QueueTrigger
 commitTrigger -> Db : Insert commit
 FU -> W: Looks at commit log UI
-W -> searchFunc : Search
+W -> searchFunc : Search (GET)
 searchFunc -> Db : Select commits
 
 @enduml
