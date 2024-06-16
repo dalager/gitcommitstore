@@ -1,14 +1,24 @@
-name: Build PR
+name: Validate Pull Request
 
 on:
   pull_request:
     branches:
       - main
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: "./src/Function" # set this to the path to your function app project, defaults to the repository root
-  DOTNET_VERSION: "8.0.x" # set this to the dotnet version to use (e.g. '2.1.x', '3.1.x', '5.0.x')
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: "./src/Function"
+  DOTNET_VERSION: "8.0.x"
 
 jobs:
+  check_formatting:
+    runs-on: ubuntu-latest
+    name: Check Formatting
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v3
+      - run: |
+          dotnet tool restore
+          dotnet csharpier . --check
+
   build:
     runs-on: windows-latest
     steps:
